@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Admin</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Dashboard Admin</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>ID giao dịch</th>
+        <th>ID khách hàng</th>
+        <th>ID xe</th>
+        <th>Trạng thái</th>
+        <th>Hành động</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% transactions.forEach(transaction => { %>
+        <tr>
+          <td><%= transaction.transaction_id %></td>
+          <td><%= transaction.citizen_id %></td>
+          <td><%= transaction.model_car_id %></td>
+          <td><%= transaction.status_of_purchasing %></td>
+          <td>
+            <% if (transaction.status_of_purchasing === 'deposited') { %>
+              <form action="/admin/xac-nhan/<%= transaction.transaction_id %>" method="POST">
+                <button type="submit">Xác nhận</button>
+              </form>
+            <% } else { %>
+              Đã xác nhận
+            <% } %>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+
+  <script src="/js/script.js"></script>
+</body>
+</html>

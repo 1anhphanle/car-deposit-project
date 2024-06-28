@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Đặt cọc xe</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <h1>Chọn xe để đặt cọc</h1>
+    <form action="/dat-coc" method="POST">
+      <select name="modelCarId">
+        <% cars.forEach(car => { %>
+          <option value="<%= car.model_car_id %>"><%= car.model_car_name %></option>
+        <% }); %>
+      </select>
+
+      <h2>Thông tin khách hàng</h2>
+      <input type="text" name="hoTen" placeholder="Họ và tên" required />
+      <input type="text" name="cccd" placeholder="Số căn cước công dân" required />
+      <input type="tel" name="soDienThoai" placeholder="Số điện thoại" required />
+      <input type="email" name="email" placeholder="Email" />
+      <input type="text" name="diaChi" placeholder="Địa chỉ" />
+      <button type="submit" id="datCocButton">Đặt cọc</button>
+    </form>
+
+    <div id="message" style="display: none;">
+      <p>Đặt cọc thành công. Đang chờ xác nhận từ admin.</p>
+    </div>
+
+    <div id="successMessage" style="display: none;">
+      <p>Thanh toán thành công!</p>
+    </div>
+
+    <script src="/js/script.js"></script>
+    <script>
+      const datCocButton = document.getElementById('datCocButton');
+      const message = document.getElementById('message');
+      const successMessage = document.getElementById('successMessage');
+
+      datCocButton.addEventListener('click', () => {
+        message.style.display = 'block';
+      });
+
+      // Sử dụng AJAX để kiểm tra trạng thái giao dịch
+      function checkTransactionStatus(transactionId) {
+        fetch(`/api/transaction/${transactionId}`)
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.status === 'paid') {
+              message.style.display = 'none';
+              successMessage.style.display = 'block';
+            }
+          });
+      }
+
+      // Ví dụ cách lấy transactionId từ server (có thể thay đổi theo cách của bạn)
+      const transactionId = 'your_transaction_id'; 
+      checkTransactionStatus(transactionId);
+      setInterval(() => checkTransactionStatus(transactionId), 5000); // Kiểm tra trạng thái mỗi 5 giây
+    </script>
+  </body>
+</html>
