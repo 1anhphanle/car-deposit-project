@@ -41,6 +41,12 @@ router.post('/dat-coc', async (req, res) => {
             return res.status(400).send('Xe không tồn tại.');
         }
 
+        // Kiểm tra xem xe còn hàng hay không
+        const carAvailability = carInfo.rows[0].Car_Number_Availability;
+        if (carAvailability <= 0) {
+            return res.status(400).send('Xe đã hết hàng.');
+        }
+
         // Tính toán ngày hết hạn bảo hành (giả sử bảo hành 1 năm)
         const warrantyValidDate = new Date();
         warrantyValidDate.setFullYear(warrantyValidDate.getFullYear() + 1);
@@ -64,7 +70,13 @@ router.post('/dat-coc', async (req, res) => {
         );
 
         if (newTransaction.rowCount > 0) {
-            res.send('Đặt cọc thành công. Đang chờ xác nhận từ admin.'); // Trả về thông báo chờ xác nhận
+            // Cập nhật số lượng giao dịch của khách hàng
+            await pool.query(
+                'UPDATE dataCUSTOMER SET Number_Transaction = Number_Transaction + 1 WHERE Citizen_ID = $1',
+                [cccd]
+            );
+
+            res.send('Đặt cọc thành công. Đang chờ xác nhận từ admin.');
         } else {
             res.status(500).send('Lỗi server');
         }
